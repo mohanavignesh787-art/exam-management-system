@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExamPro – Examination Management System | WD-COL-003</title>
+  <meta name="description" content="ExamPro is a professional examination management system for scheduling exams, managing subjects, issuing hall tickets, conducting simulated exams, evaluating answer sheets, and generating marksheets.">
+  <meta property="og:title" content="ExamPro – Examination Management System">
+  <meta property="og:description" content="Professional institutional examination management system for Data Alcott Systems Web Development Task WD-COL-003.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- CDNs: Chart.js, jsPDF, Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+</head>
+<body class="theme-light">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+  <!-- Main App Shell -->
+  <div id="app-shell" class="app-shell">
+    
+    <!-- Sidebar Navigation -->
+    <aside id="app-sidebar" class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-lockup">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="brand-info">
+            <span class="brand-title">ExamPro</span>
+            <span class="brand-tag">Academic Portal</span>
+          </div>
+        </div>
+        <button id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close Sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Current Role Indicator -->
+      <div class="current-role-badge">
+        <span class="role-dot"></span>
+        <span class="role-text" id="sidebar-role-text">Admin Mode</span>
+        <span class="role-dept" id="sidebar-user-dept">Academic Affairs</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav" aria-label="Main Navigation">
+        <div class="nav-section-title">Core Modules</div>
+
+        <button class="nav-item active" data-view="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1"/>
+            <rect width="7" height="5" x="14" y="3" rx="1"/>
+            <rect width="7" height="9" x="14" y="12" rx="1"/>
+            <rect width="7" height="5" x="3" y="16" rx="1"/>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button class="nav-item" data-view="exams" data-roles="admin,teacher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>
+          </svg>
+          <span>Exam Scheduling</span>
+        </button>
+
+        <button class="nav-item" data-view="subjects" data-roles="admin,teacher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10M6 10h10M6 14h6"/>
+          </svg>
+          <span>Subject Management</span>
+        </button>
+
+        <button class="nav-item" data-view="hall-tickets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="14" x="2" y="5" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <circle cx="7" cy="15" r="1.5"/>
+            <line x1="12" y1="15" x2="17" y2="15"/>
+          </svg>
+          <span>Hall Tickets</span>
+        </button>
+
+        <button class="nav-item" data-view="online-exam">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Simulated Exam</span>
+        </button>
+
+        <div class="nav-section-title">Evaluation & Grades</div>
+
+        <button class="nav-item" data-view="answer-sheets" data-roles="admin,teacher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <path d="m9 15 2 2 4-4"/>
+          </svg>
+          <span>Answer Sheets</span>
+        </button>
+
+        <button class="nav-item" data-view="results" data-roles="admin,teacher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+            <line x1="2" y1="20" x2="22" y2="20"/>
+          </svg>
+          <span>Result Processing</span>
+        </button>
+
+        <button class="nav-item" data-view="marksheets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+          <span>Student Marksheets</span>
+        </button>
+
+        <button class="nav-item" data-view="reports" data-roles="admin,teacher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          </svg>
+          <span>Reports & Analytics</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer Tools -->
+      <div class="sidebar-footer">
+        <div class="footer-role-switcher">
+          <label for="quick-role-select" class="footer-label">Demo Role Switcher</label>
+          <select id="quick-role-select" class="form-select role-select-compact">
+            <option value="admin">Admin (Full Access)</option>
+            <option value="teacher">Teacher (Grading & Exams)</option>
+            <option value="student">Student (Alex Vance)</option>
+          </select>
+        </div>
+        <button id="reset-data-btn" class="btn btn-secondary btn-sm w-full" title="Reset all data to default demo state">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+            <path d="M21 3v5h-5"/>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+            <path d="M8 16H3v5"/>
+          </svg>
+          <span>Reset Demo Data</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" aria-label="Toggle navigation menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="breadcrumb-trail">
+            <span class="breadcrumb-root">ExamPro</span>
+            <span class="breadcrumb-separator">/</span>
+            <span id="current-view-title" class="breadcrumb-current">Dashboard</span>
+          </div>
+        </div>
+
+        <div class="top-bar-center">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="global-search" class="global-search-input" placeholder="Search exams, subjects, students..." aria-label="Search examinations and records">
+          </div>
+        </div>
+
+        <div class="top-bar-right">
+          <!-- Notification Bell -->
+          <div class="dropdown-wrapper">
+            <button id="notif-btn" class="topbar-icon-btn" aria-label="Notifications" title="View Recent Exam Notices">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+              </svg>
+              <span class="notif-badge" id="notif-count">3</span>
+            </button>
+            <div id="notif-dropdown" class="dropdown-menu notif-dropdown hidden">
+              <div class="dropdown-header">
+                <span class="font-semibold text-sm">Exam Notifications</span>
+                <span class="text-xs text-muted" id="notif-unread-text">3 new</span>
+              </div>
+              <div class="notif-list" id="notif-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button id="theme-toggle-btn" class="topbar-icon-btn" aria-label="Toggle light/dark theme" title="Toggle Dark/Light Mode">
+            <svg id="theme-sun-icon" class="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg id="theme-moon-icon" class="theme-icon hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="dropdown-wrapper">
+            <button id="user-profile-btn" class="user-profile-btn" aria-label="User Account Menu">
+              <div class="avatar-circle" id="topbar-avatar">SJ</div>
+              <div class="user-meta hidden-mobile">
+                <span class="user-name" id="topbar-user-name">Dr. Sarah Jenkins</span>
+                <span class="user-role-label" id="topbar-user-role">Administrator</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div id="user-dropdown" class="dropdown-menu user-dropdown hidden">
+              <div class="dropdown-header">
+                <div class="font-semibold text-sm" id="user-dropdown-name">Dr. Sarah Jenkins</div>
+                <div class="text-xs text-muted" id="user-dropdown-email">admin@exampro.demo</div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-section-title">Switch Active Role</div>
+              <button class="dropdown-item switch-role-item" data-role="admin">
+                <span class="role-chip chip-admin">Admin</span>
+                <span>Dr. Sarah Jenkins</span>
+              </button>
+              <button class="dropdown-item switch-role-item" data-role="teacher">
+                <span class="role-chip chip-teacher">Teacher</span>
+                <span>Prof. Marcus Thorne</span>
+              </button>
+              <button class="dropdown-item switch-role-item" data-role="student">
+                <span class="role-chip chip-student">Student</span>
+                <span>Alex Vance (STU-2024-001)</span>
+              </button>
+              <div class="dropdown-divider"></div>
+              <button id="btn-open-login" class="dropdown-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                  <polyline points="10 17 15 12 10 7"/>
+                  <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+                <span>Switch / Re-login</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Container (Views dynamically switched) -->
+      <main id="main-content" class="main-content">
+        
+        <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+        <section id="view-dashboard" class="app-view active">
+          <!-- Page Header -->
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Institutional Examination Dashboard</h1>
+              <p class="view-subtitle">Live overview of active exam schedules, subject evaluation statuses, and institutional grading statistics.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-primary" onclick="window.ExamPro.openScheduleModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Schedule Exam</span>
+              </button>
+              <button class="btn btn-secondary" onclick="window.ExamPro.navigateTo('reports')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>View Reports</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Summary Metric Cards (6 cards) -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Exams</span>
+                <div class="stat-icon-wrapper icon-red">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect width="18" height="18" x="3" y="4" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-total-exams">0</div>
+              <div class="stat-meta">Across 5 departments</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Upcoming Exams</span>
+                <div class="stat-icon-wrapper icon-amber">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-upcoming-exams">0</div>
+              <div class="stat-meta">Scheduled next 30 days</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Completed Exams</span>
+                <div class="stat-icon-wrapper icon-green">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-completed-exams">0</div>
+              <div class="stat-meta">Conducted this term</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Enrolled Students</span>
+                <div class="stat-icon-wrapper icon-blue">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-total-students">0</div>
+              <div class="stat-meta">Active candidate roster</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Results Published</span>
+                <div class="stat-icon-wrapper icon-emerald">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <path d="m9 15 2 2 4-4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-results-published">0</div>
+              <div class="stat-meta">Marksheets available</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Results Pending</span>
+                <div class="stat-icon-wrapper icon-rose">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="stat-results-pending">0</div>
+              <div class="stat-meta">Under answer sheet review</div>
+            </div>
+          </div>
+
+          <!-- KPI Summary Strip: Pass percentage & Average score -->
+          <div class="kpi-banner">
+            <div class="kpi-item">
+              <span class="kpi-label">Institution Pass Percentage</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value tabular-nums" id="kpi-pass-rate">0.0%</span>
+                <span class="kpi-pill success">All Departments</span>
+              </div>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-item">
+              <span class="kpi-label">Institutional Mean Score</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value tabular-nums" id="kpi-avg-score">0.0 / 100</span>
+                <span class="kpi-pill neutral">Standard Normalized</span>
+              </div>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-item">
+              <span class="kpi-label">Active Question Bank</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value tabular-nums" id="kpi-total-questions">12 MCQs</span>
+                <span class="kpi-pill info">Online Exam Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid-2-col">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Exam Status Distribution</div>
+                <div class="card-subtitle">Breakdown of current examination cycle lifecycle</div>
+              </div>
+              <div class="card-body chart-container-rel">
+                <canvas id="chart-exam-status" height="240"></canvas>
+                <div id="chart-exam-fallback" class="chart-fallback-list hidden"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Subject-wise Average Marks</div>
+                <div class="card-subtitle">Mean performance across major curriculum offerings</div>
+              </div>
+              <div class="card-body chart-container-rel">
+                <canvas id="chart-subject-perf" height="240"></canvas>
+                <div id="chart-subject-fallback" class="chart-fallback-list hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons Row -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Rapid Operational Actions</div>
+              <div class="card-subtitle">Standard administrative workflows for exam coordinators and faculty</div>
+            </div>
+            <div class="card-body">
+              <div class="quick-actions-grid">
+                <button class="quick-action-card" onclick="window.ExamPro.openScheduleModal()">
+                  <div class="quick-action-icon red">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                  </div>
+                  <div class="quick-action-text">
+                    <strong>Schedule New Exam</strong>
+                    <span>Set date, venue, time, passing threshold</span>
+                  </div>
+                </button>
+
+                <button class="quick-action-card" onclick="window.ExamPro.openSubjectModal()">
+                  <div class="quick-action-icon blue">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                      <line x1="10" y1="6" x2="16" y2="6"/>
+                      <line x1="10" y1="10" x2="16" y2="10"/>
+                    </svg>
+                  </div>
+                  <div class="quick-action-text">
+                    <strong>Add Curriculum Subject</strong>
+                    <span>Define credits, faculty, syllabus</span>
+                  </div>
+                </button>
+
+                <button class="quick-action-card" onclick="window.ExamPro.navigateTo('hall-tickets')">
+                  <div class="quick-action-icon emerald">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect width="20" height="14" x="2" y="5" rx="2"/>
+                      <line x1="2" y1="10" x2="22" y2="10"/>
+                      <circle cx="7" cy="15" r="1.5"/>
+                    </svg>
+                  </div>
+                  <div class="quick-action-text">
+                    <strong>Generate Hall Ticket</strong>
+                    <span>Produce signed printable admission passes</span>
+                  </div>
+                </button>
+
+                <button class="quick-action-card" onclick="window.ExamPro.navigateTo('results')">
+                  <div class="quick-action-icon amber">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m9 11 3 3L22 4"/>
+                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                  </div>
+                  <div class="quick-action-text">
+                    <strong>Process & Publish Results</strong>
+                    <span>Compute grades, publish student marks</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tables Row: Upcoming Exams & Recent Result Publications -->
+          <div class="grid-2-col">
+            <!-- Upcoming Exams Table -->
+            <div class="card">
+              <div class="card-header flex-between">
+                <div>
+                  <div class="card-title">Upcoming Examinations</div>
+                  <div class="card-subtitle">Next scheduled academic sessions</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.ExamPro.navigateTo('exams')">View All</button>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Exam & Subject</th>
+                        <th>Type</th>
+                        <th>Date & Time</th>
+                        <th>Venue</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboard-upcoming-tbody">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Result Publications -->
+            <div class="card">
+              <div class="card-header flex-between">
+                <div>
+                  <div class="card-title">Recent Result Publications</div>
+                  <div class="card-subtitle">Published student transcripts & grades</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.ExamPro.navigateTo('results')">View All</button>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Student</th>
+                        <th>Exam</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboard-recent-results-tbody">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 2: EXAM SCHEDULING ==================== -->
+        <section id="view-exams" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Examination Scheduling</h1>
+              <p class="view-subtitle">Create, configure, modify, and monitor institutional examination timetables across departments.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.exportExamsCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Export CSV</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.openScheduleModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Schedule New Exam</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Controls Bar -->
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="filter-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="exam-filter-search">Search Examinations</label>
+                  <input type="text" id="exam-filter-search" class="form-input" placeholder="Search by exam name or ID...">
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="exam-filter-type">Exam Type</label>
+                  <select id="exam-filter-type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="Mid-Term Examination">Mid-Term Examination</option>
+                    <option value="Final Examination">Final Examination</option>
+                    <option value="Practical Examination">Practical Examination</option>
+                    <option value="Online Examination">Online Examination</option>
+                    <option value="Quiz/Test">Quiz/Test</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="exam-filter-subject">Subject</label>
+                  <select id="exam-filter-subject" class="form-select">
+                    <option value="">All Subjects</option>
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="exam-filter-status">Status</label>
+                  <select id="exam-filter-status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Results Pending">Results Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button id="exam-filter-reset" class="btn btn-secondary w-full" onclick="window.ExamPro.resetExamFilters()">Reset Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exams Table Card -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <span class="card-title">Scheduled Examinations</span>
+                <span class="text-xs text-muted ml-2">(<span id="exam-count-badge">0</span> records)</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Exam ID</th>
+                      <th>Exam Name</th>
+                      <th>Subject</th>
+                      <th>Type</th>
+                      <th>Date</th>
+                      <th>Time & Duration</th>
+                      <th>Marks (Max/Pass)</th>
+                      <th>Venue</th>
+                      <th>Status</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="exams-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="exams-empty-state" class="empty-state hidden">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect width="18" height="18" x="3" y="4" rx="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <h3>No examinations match your filter</h3>
+                <p>Try adjusting your search criteria or schedule a new examination session.</p>
+                <button class="btn btn-primary btn-sm mt-3" onclick="window.ExamPro.openScheduleModal()">Schedule Exam</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 3: SUBJECT MANAGEMENT ==================== -->
+        <section id="view-subjects" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Curriculum & Subject Management</h1>
+              <p class="view-subtitle">Manage accredited institutional course modules, credit allocations, syllabus rubrics, and faculty assignments.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.exportSubjectsCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Export CSV</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.openSubjectModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add New Subject</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Subject Search & Filters -->
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="filter-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="subject-filter-search">Search Subjects</label>
+                  <input type="text" id="subject-filter-search" class="form-input" placeholder="Search by name, code or teacher...">
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="subject-filter-dept">Department</label>
+                  <select id="subject-filter-dept" class="form-select">
+                    <option value="">All Departments</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="subject-filter-sem">Semester</label>
+                  <select id="subject-filter-sem" class="form-select">
+                    <option value="">All Semesters</option>
+                    <option value="4">Semester 4</option>
+                    <option value="6">Semester 6</option>
+                    <option value="8">Semester 8</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.resetSubjectFilters()">Reset Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subject Grid / Table -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <span class="card-title">Curriculum Subjects</span>
+                <span class="text-xs text-muted ml-2">(<span id="subject-count-badge">0</span> modules)</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Subject Code</th>
+                      <th>Subject Title</th>
+                      <th>Department</th>
+                      <th>Semester</th>
+                      <th>Assigned Faculty</th>
+                      <th>Credits</th>
+                      <th>Marks (Max / Pass)</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="subjects-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="subjects-empty-state" class="empty-state hidden">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                </svg>
+                <h3>No subjects found</h3>
+                <p>Try modifying your filter options or register a new curriculum course.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 4: HALL TICKET GENERATION ==================== -->
+        <section id="view-hall-tickets" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Hall Ticket & Admit Card Issuance</h1>
+              <p class="view-subtitle">Generate official authenticated student examination entry passes with security verification codes and venue details.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.printHallTicket()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect width="12" height="8" x="6" y="14"/>
+                </svg>
+                <span>Print Hall Ticket</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.downloadHallTicketPDF()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Selection Controls Bar -->
+          <div class="card mb-6">
+            <div class="card-body">
+              <div class="grid-3-col">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="ht-student-select">Select Candidate Student</label>
+                  <select id="ht-student-select" class="form-select" onchange="window.ExamPro.renderHallTicket()">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="ht-exam-select">Select Examination Session</label>
+                  <select id="ht-exam-select" class="form-select" onchange="window.ExamPro.renderHallTicket()">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.renderHallTicket()">Refresh Ticket</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Printable Hall Ticket Card / Preview Area -->
+          <div class="hall-ticket-container">
+            <div id="printable-hall-ticket" class="hall-ticket-sheet">
+              <!-- Official Header -->
+              <div class="ht-institution-header">
+                <div class="ht-emblem">
+                  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                  </svg>
+                </div>
+                <div class="ht-institution-info">
+                  <h2 class="ht-college-name">DATA ALCOTT INSTITUTE OF TECHNOLOGY & SCIENCE</h2>
+                  <div class="ht-college-meta">Affiliated to National Board of Technical Education · Task WD-COL-003</div>
+                  <div class="ht-badge-title">OFFICIAL ADMISSION TICKET / HALL TICKET</div>
+                  <div class="ht-academic-year">ACADEMIC SESSION: 2025 – 2026</div>
+                </div>
+                <div class="ht-barcode-box">
+                  <div class="ht-barcode-lines"></div>
+                  <span class="ht-barcode-text" id="ht-preview-number">HT-2026-CS8492</span>
+                </div>
+              </div>
+
+              <!-- Student Profile & Exam Meta Grid -->
+              <div class="ht-content-grid">
+                <div class="ht-details-table">
+                  <table class="ht-info-tbl">
+                    <tbody>
+                      <tr>
+                        <td class="ht-lbl">Candidate Name:</td>
+                        <td class="ht-val font-bold" id="ht-cand-name">Alex Vance</td>
+                        <td class="ht-lbl">Student Roll ID:</td>
+                        <td class="ht-val font-mono font-bold" id="ht-cand-id">STU-2024-001</td>
+                      </tr>
+                      <tr>
+                        <td class="ht-lbl">Department:</td>
+                        <td class="ht-val" id="ht-cand-dept">Computer Science & Engineering</td>
+                        <td class="ht-lbl">Semester:</td>
+                        <td class="ht-val" id="ht-cand-sem">Semester 6</td>
+                      </tr>
+                      <tr>
+                        <td class="ht-lbl">Exam Name:</td>
+                        <td class="ht-val" id="ht-exam-name">End-Semester Final Examination</td>
+                        <td class="ht-lbl">Exam Type:</td>
+                        <td class="ht-val" id="ht-exam-type">Final Examination</td>
+                      </tr>
+                      <tr>
+                        <td class="ht-lbl">Subject Code & Name:</td>
+                        <td class="ht-val font-bold" id="ht-subject-name">CS-301 · Advanced Algorithms</td>
+                        <td class="ht-lbl">Assigned Faculty:</td>
+                        <td class="ht-val" id="ht-faculty-name">Prof. Marcus Thorne</td>
+                      </tr>
+                      <tr>
+                        <td class="ht-lbl">Examination Date:</td>
+                        <td class="ht-val font-bold" id="ht-exam-date">05 November 2026</td>
+                        <td class="ht-lbl">Session Timing:</td>
+                        <td class="ht-val" id="ht-exam-time">09:30 AM – 12:30 PM (180 mins)</td>
+                      </tr>
+                      <tr>
+                        <td class="ht-lbl">Assigned Venue:</td>
+                        <td class="ht-val font-bold text-red" id="ht-exam-venue">Hall A-102 (Desk: CS-42)</td>
+                        <td class="ht-lbl">Max / Pass Marks:</td>
+                        <td class="ht-val" id="ht-exam-marks">100 / 40</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Photo Area -->
+                <div class="ht-photo-box">
+                  <div class="ht-photo-frame" id="ht-photo-container">
+                    <img id="ht-photo-img" src="" alt="Candidate Photo" class="ht-photo" onerror="this.src='https://ui-avatars.com/api/?name=Alex+Vance&background=FEE2E2&color=DC2626&size=150'">
+                  </div>
+                  <span class="ht-photo-caption">Official Candidate Photo</span>
+                </div>
+              </div>
+
+              <!-- Examination Instructions -->
+              <div class="ht-instructions-box">
+                <div class="ht-inst-heading">MANDATORY EXAMINATION INSTRUCTIONS FOR CANDIDATES:</div>
+                <ol class="ht-inst-list">
+                  <li>Candidates must report to the allocated examination venue at least <strong>30 minutes</strong> prior to scheduled start time. Late entry beyond 15 minutes is strictly prohibited.</li>
+                  <li>Possession of smartphones, smartwatches, programmable calculators, or unauthorized study material in the hall is a non-bailable offense under institutional regulations.</li>
+                  <li>The candidate must preserve this hall ticket until the final statement of marks is issued. It must be presented upon demand to the invigilator.</li>
+                  <li>Write the Exam ID and Candidate Roll Number clearly on the answer booklet cover sheet before commencing responses.</li>
+                </ol>
+              </div>
+
+              <!-- Signatures Row -->
+              <div class="ht-signatures-row">
+                <div class="ht-sig-block">
+                  <div class="ht-sig-line"></div>
+                  <span class="ht-sig-label">Candidate Signature</span>
+                  <span class="ht-sig-sub">(To be signed in presence of Invigilator)</span>
+                </div>
+                <div class="ht-seal-block">
+                  <div class="ht-official-seal">
+                    <span>INSTITUTION</span>
+                    <strong>SEAL</strong>
+                    <span>EXAM CELL</span>
+                  </div>
+                </div>
+                <div class="ht-sig-block">
+                  <div class="ht-sig-stamp">
+                    <div class="ht-digital-sig">Dr. Sarah Jenkins</div>
+                  </div>
+                  <div class="ht-sig-line"></div>
+                  <span class="ht-sig-label">Controller of Examinations</span>
+                  <span class="ht-sig-sub">Authorized Institutional Signatory</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 5: ONLINE EXAM (SIMULATED) ==================== -->
+        <section id="view-online-exam" class="app-view">
+          
+          <!-- State 1: Lobby / Pre-Exam Setup -->
+          <div id="exam-lobby-state" class="online-exam-state">
+            <div class="view-header">
+              <div>
+                <h1 class="view-title">Simulated Online Examination Portal</h1>
+                <p class="view-subtitle">Interactive timed testing engine featuring automatic question navigation, timer countdown, and instant score evaluation.</p>
+              </div>
+            </div>
+
+            <div class="sim-notice-banner">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div>
+                <strong>Simulation Notice:</strong> This is a frontend-simulated examination testing interface designed for institutional demonstration. Auto-evaluated scores and completed answer scripts will be registered to your local browser storage.
+              </div>
+            </div>
+
+            <div class="grid-2-col">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Test Session Configuration</div>
+                  <div class="card-subtitle">Select examinee candidate and available question test</div>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="form-label" for="sim-student-select">Test Candidate</label>
+                    <select id="sim-student-select" class="form-select">
+                      <!-- Populated dynamically -->
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="sim-exam-select">Available Online Examination</label>
+                    <select id="sim-exam-select" class="form-select" onchange="window.ExamPro.updateOnlineLobbyDetails()">
+                      <!-- Populated with online exams -->
+                    </select>
+                  </div>
+
+                  <div class="lobby-meta-list" id="lobby-exam-meta">
+                    <div class="lobby-meta-row">
+                      <span class="text-muted">Subject:</span>
+                      <strong id="lobby-sub-title">Web Technologies & Frameworks</strong>
+                    </div>
+                    <div class="lobby-meta-row">
+                      <span class="text-muted">Total Questions:</span>
+                      <strong id="lobby-q-count">10 Questions</strong>
+                    </div>
+                    <div class="lobby-meta-row">
+                      <span class="text-muted">Time Allocated:</span>
+                      <strong id="lobby-duration">15 Minutes (Demo Speed)</strong>
+                    </div>
+                    <div class="lobby-meta-row">
+                      <span class="text-muted">Marking Scheme:</span>
+                      <strong>+2 Marks Correct, 0 Penalty</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Candidate Guidelines & Honor Code</div>
+                  <div class="card-subtitle">Review before initiating the test countdown</div>
+                </div>
+                <div class="card-body">
+                  <ul class="guidelines-list">
+                    <li>The countdown timer starts immediately upon pressing <strong>"Start Examination"</strong>.</li>
+                    <li>You can jump between questions at any time using the Question Palette.</li>
+                    <li>Your selected answers are saved automatically into your session draft.</li>
+                    <li>When the timer expires, your test will <strong>automatically submit</strong> and grade objective questions.</li>
+                    <li>Avoid refreshing the page or leaving the test window during the active session.</li>
+                  </ul>
+
+                  <div class="form-checkbox mt-6">
+                    <input type="checkbox" id="sim-terms-agree">
+                    <label for="sim-terms-agree" class="font-medium text-sm">I have read and agree to follow all examination guidelines.</label>
+                  </div>
+
+                  <button id="btn-start-sim-exam" class="btn btn-primary w-full mt-6" onclick="window.ExamPro.startOnlineExam()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>Start Examination</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- State 2: Active Exam Arena -->
+          <div id="exam-active-state" class="online-exam-state hidden">
+            <!-- Exam Header Bar -->
+            <div class="exam-top-strip">
+              <div class="exam-top-title">
+                <div class="font-bold text-base" id="active-exam-title">CS-303 · Web Technologies Online Assessment</div>
+                <div class="text-xs text-muted">Candidate: <span id="active-cand-name">Alex Vance</span> (<span id="active-cand-id">STU-2024-001</span>)</div>
+              </div>
+              <div class="exam-top-timer">
+                <span class="text-xs text-muted uppercase font-semibold">Time Remaining</span>
+                <div class="timer-display" id="active-timer-display">15:00</div>
+              </div>
+              <div>
+                <button class="btn btn-primary btn-sm" onclick="window.ExamPro.confirmSubmitExam()">
+                  <span>Finish & Submit</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Exam Main Layout: Question + Palette -->
+            <div class="exam-arena-grid mt-4">
+              <!-- Left: Current Question Area -->
+              <div class="card question-card">
+                <div class="card-header flex-between">
+                  <div class="flex items-center gap-2">
+                    <span class="question-pill" id="active-q-number">Question 1 of 10</span>
+                    <span class="text-xs text-muted" id="active-q-marks">[2 Marks]</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="btn btn-secondary btn-sm" id="btn-mark-review" onclick="window.ExamPro.toggleReviewFlag()">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                      <span id="mark-review-text">Mark for Review</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="window.ExamPro.clearQuestionAnswer()">Clear</button>
+                  </div>
+                </div>
+
+                <div class="card-body">
+                  <div class="question-text" id="active-q-prompt">
+                    Which HTTP status code represents a successful resource creation in RESTful API architecture?
+                  </div>
+
+                  <div class="options-container" id="active-q-options">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <div class="card-footer flex-between">
+                  <button id="btn-prev-question" class="btn btn-secondary" onclick="window.ExamPro.prevQuestion()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    <span>Previous</span>
+                  </button>
+                  <div class="text-xs text-muted">
+                    Answered: <span class="font-bold text-green" id="active-answered-count">0</span> / <span id="active-total-count">10</span>
+                  </div>
+                  <button id="btn-next-question" class="btn btn-primary" onclick="window.ExamPro.nextQuestion()">
+                    <span>Next</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right: Question Palette & Overview -->
+              <div class="card palette-card">
+                <div class="card-header">
+                  <div class="card-title text-sm">Question Navigation Palette</div>
+                </div>
+                <div class="card-body">
+                  <div class="palette-legend">
+                    <span class="legend-item"><span class="legend-swatch answered"></span> Answered</span>
+                    <span class="legend-item"><span class="legend-swatch flagged"></span> Flagged</span>
+                    <span class="legend-item"><span class="legend-swatch unanswered"></span> Unanswered</span>
+                  </div>
+
+                  <div class="palette-grid" id="question-palette-grid">
+                    <!-- Numbers 1 to 10 rendered here -->
+                  </div>
+
+                  <div class="palette-summary mt-4">
+                    <div class="summary-line">
+                      <span>Total Questions:</span>
+                      <strong id="pal-total">10</strong>
+                    </div>
+                    <div class="summary-line">
+                      <span>Attempted:</span>
+                      <strong class="text-green" id="pal-attempted">0</strong>
+                    </div>
+                    <div class="summary-line">
+                      <span>Flagged for Review:</span>
+                      <strong class="text-amber" id="pal-flagged">0</strong>
+                    </div>
+                    <div class="summary-line">
+                      <span>Remaining:</span>
+                      <strong class="text-muted" id="pal-remaining">10</strong>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-primary w-full mt-6" onclick="window.ExamPro.confirmSubmitExam()">
+                    Submit Assessment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- State 3: Submission Summary & Score Card -->
+          <div id="exam-summary-state" class="online-exam-state hidden">
+            <div class="card max-w-3xl mx-auto">
+              <div class="card-header text-center">
+                <div class="success-icon-badge">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <h2 class="text-xl font-bold mt-2">Simulated Examination Submitted Successfully</h2>
+                <p class="text-xs text-muted" id="summary-meta-line">CS-303 · Web Technologies · Submitted at 14:45</p>
+              </div>
+
+              <div class="card-body">
+                <div class="score-spotlight">
+                  <div class="score-number tabular-nums" id="summary-score-display">18 / 20</div>
+                  <div class="score-percent" id="summary-percent-display">90.0% · Grade: A+</div>
+                  <div class="score-status-pill success" id="summary-pass-pill">PASSED (Passing requirement: 8/20)</div>
+                </div>
+
+                <div class="grid-3-col mt-6 text-center">
+                  <div class="stat-mini">
+                    <span class="text-xs text-muted">Total Questions</span>
+                    <strong class="text-lg block" id="summary-total-q">10</strong>
+                  </div>
+                  <div class="stat-mini">
+                    <span class="text-xs text-muted">Correct Answers</span>
+                    <strong class="text-lg text-green block" id="summary-correct-q">9</strong>
+                  </div>
+                  <div class="stat-mini">
+                    <span class="text-xs text-muted">Incorrect / Skipped</span>
+                    <strong class="text-lg text-red block" id="summary-incorrect-q">1</strong>
+                  </div>
+                </div>
+
+                <div class="card mt-6">
+                  <div class="card-header">
+                    <div class="card-title text-sm">Detailed Question Breakdown</div>
+                  </div>
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="data-table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                            <th>Marks</th>
+                          </tr>
+                        </thead>
+                        <tbody id="summary-questions-tbody">
+                          <!-- Filled with breakdown -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer flex-between">
+                <button class="btn btn-secondary" onclick="window.ExamPro.resetOnlineExamLobby()">
+                  Take Another Exam
+                </button>
+                <div class="flex gap-2">
+                  <button class="btn btn-secondary" onclick="window.ExamPro.navigateTo('answer-sheets')">
+                    View in Answer Sheets
+                  </button>
+                  <button class="btn btn-primary" onclick="window.ExamPro.navigateTo('dashboard')">
+                    Back to Dashboard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== VIEW 6: ANSWER SHEET EVALUATION ==================== -->
+        <section id="view-answer-sheets" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Answer Sheet Evaluation & Grading</h1>
+              <p class="view-subtitle">Review submitted examination attempts, assess objective & descriptive answers, award faculty marks, and provide evaluator remarks.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.exportAnswerSheetsCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Answer Sheets Search & Filter -->
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="filter-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="as-filter-search">Search Candidate</label>
+                  <input type="text" id="as-filter-search" class="form-input" placeholder="Search by student name or roll ID...">
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="as-filter-exam">Examination</label>
+                  <select id="as-filter-exam" class="form-select">
+                    <option value="">All Examinations</option>
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="as-filter-status">Evaluation Status</label>
+                  <select id="as-filter-status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Evaluated">Evaluated</option>
+                    <option value="Pending Evaluation">Pending Evaluation</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.resetAnswerSheetFilters()">Reset Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answer Sheets Table -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <span class="card-title">Submitted Answer Sheets</span>
+                <span class="text-xs text-muted ml-2">(<span id="as-count-badge">0</span> submissions)</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Submission ID</th>
+                      <th>Student Candidate</th>
+                      <th>Examination</th>
+                      <th>Submitted At</th>
+                      <th>Auto (MCQ)</th>
+                      <th>Descriptive</th>
+                      <th>Total Score</th>
+                      <th>Status</th>
+                      <th class="text-right">Evaluation</th>
+                    </tr>
+                  </thead>
+                  <tbody id="answer-sheets-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 7: RESULT PROCESSING ==================== -->
+        <section id="view-results" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Academic Result Processing & Publication</h1>
+              <p class="view-subtitle">Consolidate subject marks, compute normalized percentages, enforce subject-level passing rubrics, assign letter grades, and publish official marks.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.openMeritListModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                  <path d="M4 22h16"/>
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                </svg>
+                <span>View Merit List</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.publishAllFilteredResults()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m9 12 2 2 4-4"/>
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                </svg>
+                <span>Publish All Results</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Result Grading Scale Reference Banner -->
+          <div class="grading-reference-banner">
+            <div class="font-semibold text-xs uppercase tracking-wide mb-1 text-slate-700 dark:text-slate-200">Institutional Grading Scale & Honors:</div>
+            <div class="grade-scale-row">
+              <span class="scale-item"><strong>90–100%:</strong> A+ (Distinction)</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item"><strong>80–89%:</strong> A</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item"><strong>70–79%:</strong> B+</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item"><strong>60–69%:</strong> B</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item"><strong>50–59%:</strong> C</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item"><strong>40–49%:</strong> D (Pass)</span>
+              <span class="scale-sep">·</span>
+              <span class="scale-item text-red"><strong>&lt;40%:</strong> F (Fail)</span>
+            </div>
+            <div class="text-xs text-muted mt-1">Rule: A candidate must satisfy each enrolled subject's minimum passing marks requirement to be awarded an overall PASS.</div>
+          </div>
+
+          <!-- Result Filters -->
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="filter-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="res-filter-search">Search Candidate</label>
+                  <input type="text" id="res-filter-search" class="form-input" placeholder="Search by student name or roll ID...">
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="res-filter-exam">Examination</label>
+                  <select id="res-filter-exam" class="form-select">
+                    <option value="">All Examinations</option>
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="res-filter-status">Publication Status</label>
+                  <select id="res-filter-status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Published">Published</option>
+                    <option value="Pending">Pending Publication</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.resetResultFilters()">Reset Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Master Table -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <span class="card-title">Processed Examination Records</span>
+                <span class="text-xs text-muted ml-2">(<span id="results-count-badge">0</span> records)</span>
+              </div>
+              <div class="flex gap-2">
+                <button class="btn btn-secondary btn-sm" onclick="window.ExamPro.exportResultsCSV()">Export CSV</button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Student Roll ID</th>
+                      <th>Candidate Name</th>
+                      <th>Examination</th>
+                      <th>Marks (Obt / Max)</th>
+                      <th>Percentage</th>
+                      <th>Grade</th>
+                      <th>Result</th>
+                      <th>Rank</th>
+                      <th>Publication</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="results-table-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 8: STUDENT MARKSHEET ==================== -->
+        <section id="view-marksheets" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Official Student Marksheet & Grade Transcript</h1>
+              <p class="view-subtitle">Generate official transcript of marks with subject credits, grade descriptors, institutional seals, and authorized verification.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.printMarksheet()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect width="12" height="8" x="6" y="14"/>
+                </svg>
+                <span>Print Marksheet</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.downloadMarksheetPDF()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Marksheet Selector Controls -->
+          <div class="card mb-6">
+            <div class="card-body">
+              <div class="grid-3-col">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="ms-student-select">Select Student</label>
+                  <select id="ms-student-select" class="form-select" onchange="window.ExamPro.renderMarksheet()">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="ms-exam-select">Select Examination</label>
+                  <select id="ms-exam-select" class="form-select" onchange="window.ExamPro.renderMarksheet()">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.renderMarksheet()">Generate Marksheet</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unpublished Notice (if student views unpublished result) -->
+          <div id="ms-unpublished-alert" class="notice-banner warning hidden">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+              <strong>Result Pending Publication:</strong> The official transcript for this examination has not been published yet. Faculty evaluation or moderation is currently in progress.
+            </div>
+          </div>
+
+          <!-- Marksheet Paper Container -->
+          <div class="marksheet-container">
+            <div id="printable-marksheet" class="marksheet-sheet">
+              <!-- Official Header with Gold/Red institutional border -->
+              <div class="ms-header">
+                <div class="ms-header-top">
+                  <div class="ms-emblem">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                  </div>
+                  <div class="ms-title-block">
+                    <h2 class="ms-institution-title">DATA ALCOTT INSTITUTE OF TECHNOLOGY & SCIENCE</h2>
+                    <div class="ms-institution-sub">Autonomous Institution · Accredited by National Academic Council · WD-COL-003</div>
+                    <h3 class="ms-document-heading">OFFICIAL STATEMENT OF MARKS & GRADES</h3>
+                    <div class="ms-academic-session">ACADEMIC YEAR 2025 – 2026</div>
+                  </div>
+                  <div class="ms-serial-block">
+                    <span class="ms-serial-label">Transcript Serial</span>
+                    <strong class="ms-serial-num font-mono" id="ms-serial-num">MS-2026-9042</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Candidate Bio Details -->
+              <div class="ms-candidate-info-grid">
+                <div class="ms-info-col">
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Student Name:</span>
+                    <strong class="ms-val" id="ms-cand-name">Alex Vance</strong>
+                  </div>
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Roll / Student ID:</span>
+                    <strong class="ms-val font-mono" id="ms-cand-id">STU-2024-001</strong>
+                  </div>
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Department:</span>
+                    <span class="ms-val" id="ms-cand-dept">Computer Science & Engineering</span>
+                  </div>
+                </div>
+
+                <div class="ms-info-col">
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Examination:</span>
+                    <strong class="ms-val" id="ms-exam-name">End-Semester Final Assessment</strong>
+                  </div>
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Semester:</span>
+                    <span class="ms-val" id="ms-cand-sem">Semester 6</span>
+                  </div>
+                  <div class="ms-info-row">
+                    <span class="ms-lbl">Result Status:</span>
+                    <span class="ms-val font-bold text-green" id="ms-cand-status">PASSED</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Marks Table -->
+              <div class="ms-table-container">
+                <table class="ms-table">
+                  <thead>
+                    <tr>
+                      <th class="w-12">#</th>
+                      <th class="w-24">Subject Code</th>
+                      <th>Course Title</th>
+                      <th class="text-center w-16">Credits</th>
+                      <th class="text-right w-20">Max Marks</th>
+                      <th class="text-right w-20">Pass Marks</th>
+                      <th class="text-right w-20">Marks Obtained</th>
+                      <th class="text-center w-20">Grade</th>
+                      <th class="text-center w-20">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ms-subjects-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                  <tfoot>
+                    <tr class="ms-total-row font-bold">
+                      <td colspan="3" class="text-right">Grand Total:</td>
+                      <td class="text-center tabular-nums" id="ms-total-credits">15</td>
+                      <td class="text-right tabular-nums" id="ms-total-max">350</td>
+                      <td class="text-right tabular-nums" id="ms-total-pass">140</td>
+                      <td class="text-right tabular-nums text-red" id="ms-total-obtained">308</td>
+                      <td class="text-center" id="ms-final-grade">A+</td>
+                      <td class="text-center text-green" id="ms-final-pass-label">PASS</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <!-- Final Result & Statistics Summary Box -->
+              <div class="ms-summary-box">
+                <div class="ms-stat-cell">
+                  <span class="text-xs text-muted uppercase">Cumulative Percentage</span>
+                  <div class="text-xl font-bold font-mono text-slate-900" id="ms-final-percent">88.0%</div>
+                </div>
+                <div class="ms-stat-cell">
+                  <span class="text-xs text-muted uppercase">Grade Point Average</span>
+                  <div class="text-xl font-bold font-mono text-slate-900" id="ms-final-gpa">8.80 / 10</div>
+                </div>
+                <div class="ms-stat-cell">
+                  <span class="text-xs text-muted uppercase">Overall Merit Rank</span>
+                  <div class="text-xl font-bold font-mono text-red" id="ms-final-rank">Rank #1</div>
+                </div>
+                <div class="ms-stat-cell">
+                  <span class="text-xs text-muted uppercase">Classification / Honors</span>
+                  <div class="text-sm font-bold text-green" id="ms-final-classification">First Class with Distinction</div>
+                </div>
+              </div>
+
+              <!-- Grading Key Notes -->
+              <div class="ms-grading-key">
+                <strong>GRADING CRITERIA:</strong> A+ (90-100% · Outstanding) | A (80-89% · Excellent) | B+ (70-79% · Very Good) | B (60-69% · Good) | C (50-59% · Average) | D (40-49% · Pass) | F (&lt;40% · Failed). Minimum passing score in each subject is 40% of Maximum Marks.
+              </div>
+
+              <!-- Authentication & Seal Signatures -->
+              <div class="ms-footer-signatures">
+                <div class="ms-sig-block">
+                  <span class="text-xs text-muted">Date of Publication: <strong id="ms-pub-date">22 October 2026</strong></span>
+                  <div class="ms-qr-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect width="6" height="6" x="3" y="3"/>
+                      <rect width="6" height="6" x="15" y="3"/>
+                      <rect width="6" height="6" x="3" y="15"/>
+                      <path d="M15 15h2v2h-2zM19 15v4h2M15 19h2"/>
+                    </svg>
+                    <span class="text-xs">Secure Verification</span>
+                  </div>
+                </div>
+
+                <div class="ms-seal-center">
+                  <div class="official-stamp-circle">
+                    <span>EXAM CELL</span>
+                    <strong>VERIFIED</strong>
+                    <span>COE OFFICE</span>
+                  </div>
+                </div>
+
+                <div class="ms-sig-block text-right">
+                  <div class="digital-signature-text">Dr. Sarah Jenkins</div>
+                  <div class="ms-sig-line"></div>
+                  <strong class="text-xs block">Controller of Examinations</strong>
+                  <span class="text-xs text-muted">Data Alcott Institute of Technology & Science</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 9: REPORTS & ANALYTICS ==================== -->
+        <section id="view-reports" class="app-view">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Institutional Reports & Analytics</h1>
+              <p class="view-subtitle">Generate auditable academic reports, examination schedules, subject score distributions, pass/fail analytics, and exportable merit rosters.</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary" onclick="window.ExamPro.exportActiveReportCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Export Report CSV</span>
+              </button>
+              <button class="btn btn-primary" onclick="window.ExamPro.printActiveReport()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect width="12" height="8" x="6" y="14"/>
+                </svg>
+                <span>Print / PDF Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Report Selector & Filters -->
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="filter-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label" for="report-type-select">Report Type</label>
+                  <select id="report-type-select" class="form-select" onchange="window.ExamPro.switchReportType()">
+                    <option value="schedule">1. Examination Schedule Timetable</option>
+                    <option value="results">2. Student Result & Grade Summary</option>
+                    <option value="subject-perf">3. Subject-wise Performance & Pass Rates</option>
+                    <option value="pass-fail">4. Pass / Fail Demographic Analysis</option>
+                    <option value="merit">5. Institutional Merit List & Honors</option>
+                    <option value="status">6. Examination Cycle Completion Status</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="report-filter-dept">Department Filter</label>
+                  <select id="report-filter-dept" class="form-select" onchange="window.ExamPro.renderActiveReport()">
+                    <option value="">All Departments</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label class="form-label" for="report-filter-exam">Examination Filter</label>
+                  <select id="report-filter-exam" class="form-select" onchange="window.ExamPro.renderActiveReport()">
+                    <option value="">All Examinations</option>
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group mb-0 flex-end">
+                  <button class="btn btn-secondary w-full" onclick="window.ExamPro.resetReportFilters()">Reset Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Visual Chart Area -->
+          <div class="card mb-6" id="report-chart-card">
+            <div class="card-header">
+              <div class="card-title" id="report-chart-title">Visual Performance Analytics</div>
+              <div class="card-subtitle" id="report-chart-subtitle">Aggregated statistical visualization</div>
+            </div>
+            <div class="card-body chart-container-rel">
+              <canvas id="chart-report-visual" height="240"></canvas>
+            </div>
+          </div>
+
+          <!-- Report Document Card / Printable Section -->
+          <div class="card" id="printable-report-card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title" id="report-table-title">Examination Schedule Report</h3>
+                <div class="card-subtitle" id="report-table-subtitle">Official Academic Records · Generated: 22 Oct 2026</div>
+              </div>
+              <span class="text-xs text-muted" id="report-records-count">8 Records Found</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table" id="report-active-table">
+                  <thead id="report-active-thead">
+                    <!-- Populated dynamically -->
+                  </thead>
+                  <tbody id="report-active-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="report-empty-state" class="empty-state hidden">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                <h3>No records found for current criteria</h3>
+                <p>Adjust your selected report filters to view data.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Login & Registration Modal -->
+  <div id="modal-login" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-md">
+      <div class="modal-header">
+        <div class="flex items-center gap-2">
+          <div class="brand-icon small">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <span class="modal-title">ExamPro Portal Login</span>
+        </div>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-login')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="login-tabs">
+          <button id="tab-login-btn" class="login-tab-btn active" onclick="window.ExamPro.switchAuthTab('login')">Sign In</button>
+          <button id="tab-register-btn" class="login-tab-btn" onclick="window.ExamPro.switchAuthTab('register')">Register Demo User</button>
+        </div>
+
+        <!-- Tab 1: Login Form -->
+        <div id="auth-login-pane">
+          <div class="quick-login-box">
+            <span class="text-xs font-semibold text-muted block mb-2">1-Click Demo Login:</span>
+            <div class="grid-3-col gap-2">
+              <button class="btn btn-secondary btn-xs" onclick="window.ExamPro.quickLogin('admin')">
+                <strong>Admin</strong>
+              </button>
+              <button class="btn btn-secondary btn-xs" onclick="window.ExamPro.quickLogin('teacher')">
+                <strong>Teacher</strong>
+              </button>
+              <button class="btn btn-secondary btn-xs" onclick="window.ExamPro.quickLogin('student')">
+                <strong>Student</strong>
+              </button>
+            </div>
+          </div>
+
+          <form id="form-login" onsubmit="window.ExamPro.handleLoginForm(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email Address</label>
+              <input type="email" id="login-email" class="form-input" required placeholder="admin@exampro.demo" value="admin@exampro.demo">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="login-password" class="form-input" required placeholder="••••••••" value="Admin123!">
+                <button type="button" class="btn-toggle-pwd" onclick="window.ExamPro.togglePasswordVisibility('login-password')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full mt-4">Sign In</button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Register Form -->
+        <div id="auth-register-pane" class="hidden">
+          <form id="form-register" onsubmit="window.ExamPro.handleRegisterForm(event)">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" class="form-input" required placeholder="e.g. Elena Rostova">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <input type="email" id="reg-email" class="form-input" required placeholder="e.g. elena@institution.edu">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-role">Role</label>
+              <select id="reg-role" class="form-select" required>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher / Faculty</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Create Password</label>
+              <input type="password" id="reg-password" class="form-input" required placeholder="Minimum 6 characters">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full mt-4">Create Demo Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Exam Add / Edit Modal -->
+  <div id="modal-exam-form" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-2xl">
+      <div class="modal-header">
+        <span class="modal-title" id="exam-modal-title">Schedule New Examination</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-exam-form')">&times;</button>
+      </div>
+      <form id="form-exam-crud" onsubmit="window.ExamPro.saveExamForm(event)">
+        <div class="modal-body">
+          <input type="hidden" id="exam-form-mode" value="add">
+          
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label class="form-label" for="exam-input-id">Exam ID *</label>
+              <input type="text" id="exam-input-id" class="form-input font-mono" required placeholder="EXM-2026-009">
+              <span class="form-hint">Must be unique (e.g. EXM-2026-009)</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-name">Exam Session Title *</label>
+              <input type="text" id="exam-input-name" class="form-input" required placeholder="Mid-Term Theory Examination">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label class="form-label" for="exam-input-subject">Curriculum Subject *</label>
+              <select id="exam-input-subject" class="form-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-type">Examination Type *</label>
+              <select id="exam-input-type" class="form-select" required>
+                <option value="Mid-Term Examination">Mid-Term Examination</option>
+                <option value="Final Examination">Final Examination</option>
+                <option value="Practical Examination">Practical Examination</option>
+                <option value="Online Examination">Online Examination</option>
+                <option value="Quiz/Test">Quiz/Test</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-3-col">
+            <div class="form-group">
+              <label class="form-label" for="exam-input-date">Exam Date *</label>
+              <input type="date" id="exam-input-date" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-start-time">Start Time *</label>
+              <input type="time" id="exam-input-start-time" class="form-input" required value="09:30">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-end-time">End Time *</label>
+              <input type="time" id="exam-input-end-time" class="form-input" required value="12:30">
+            </div>
+          </div>
+
+          <div class="grid-3-col">
+            <div class="form-group">
+              <label class="form-label" for="exam-input-duration">Duration (Minutes) *</label>
+              <input type="number" id="exam-input-duration" class="form-input" required min="15" max="300" value="180">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-max-marks">Maximum Marks *</label>
+              <input type="number" id="exam-input-max-marks" class="form-input" required min="10" max="200" value="100">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-pass-marks">Passing Marks *</label>
+              <input type="number" id="exam-input-pass-marks" class="form-input" required min="1" max="100" value="40">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label class="form-label" for="exam-input-venue">Examination Venue / Room *</label>
+              <input type="text" id="exam-input-venue" class="form-input" required placeholder="e.g. Hall A-102 or Online Portal" value="Hall A-102">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exam-input-status">Status *</label>
+              <select id="exam-input-status" class="form-select" required>
+                <option value="Scheduled">Scheduled</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Results Pending">Results Pending</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-exam-form')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Examination</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Exam Details Modal -->
+  <div id="modal-exam-view" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-lg">
+      <div class="modal-header">
+        <span class="modal-title">Examination Details</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-exam-view')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-exam-view-content">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-exam-view')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Subject Add / Edit Modal -->
+  <div id="modal-subject-form" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-2xl">
+      <div class="modal-header">
+        <span class="modal-title" id="subject-modal-title">Add Curriculum Subject</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-subject-form')">&times;</button>
+      </div>
+      <form id="form-subject-crud" onsubmit="window.ExamPro.saveSubjectForm(event)">
+        <div class="modal-body">
+          <input type="hidden" id="subject-form-mode" value="add">
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label class="form-label" for="sub-input-code">Subject Code *</label>
+              <input type="text" id="sub-input-code" class="form-input font-mono" required placeholder="e.g. CS-305">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sub-input-name">Subject Name *</label>
+              <input type="text" id="sub-input-name" class="form-input" required placeholder="e.g. Machine Learning & Neural Networks">
+            </div>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label class="form-label" for="sub-input-dept">Department *</label>
+              <select id="sub-input-dept" class="form-select" required>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Mechanical">Mechanical</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sub-input-sem">Semester *</label>
+              <select id="sub-input-sem" class="form-select" required>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-3-col">
+            <div class="form-group">
+              <label class="form-label" for="sub-input-teacher">Assigned Faculty *</label>
+              <input type="text" id="sub-input-teacher" class="form-input" required placeholder="Prof. Marcus Thorne">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sub-input-credits">Credits *</label>
+              <input type="number" id="sub-input-credits" class="form-input" required min="1" max="10" value="4">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sub-input-max-marks">Maximum Marks *</label>
+              <input type="number" id="sub-input-max-marks" class="form-input" required min="20" max="200" value="100">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sub-input-pass-marks">Passing Marks *</label>
+            <input type="number" id="sub-input-pass-marks" class="form-input" required min="1" max="100" value="40">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sub-input-syllabus">Syllabus Overview / Topics Covered</label>
+            <textarea id="sub-input-syllabus" class="form-input" rows="3" placeholder="Outline core modules, lab requirements, and study reference textbooks..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-subject-form')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Subject</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Subject View Modal -->
+  <div id="modal-subject-view" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-lg">
+      <div class="modal-header">
+        <span class="modal-title">Curriculum Subject Details</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-subject-view')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-subject-view-content">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-subject-view')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Answer Sheet Evaluation Modal -->
+  <div id="modal-evaluate-as" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-3xl">
+      <div class="modal-header">
+        <span class="modal-title">Evaluate Answer Sheet & Award Marks</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-evaluate-as')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-evaluate-as-content">
+        <!-- Injected dynamically with objective review + descriptive score inputs -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-evaluate-as')">Cancel</button>
+        <button class="btn btn-primary" onclick="window.ExamPro.saveEvaluationMarks()">Save Evaluation & Update Results</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Result Edit / Marks Entry Modal -->
+  <div id="modal-result-edit" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-xl">
+      <div class="modal-header">
+        <span class="modal-title">Edit Candidate Marks & Result</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-result-edit')">&times;</button>
+      </div>
+      <form id="form-result-edit" onsubmit="window.ExamPro.saveResultMarks(event)">
+        <div class="modal-body" id="modal-result-edit-content">
+          <!-- Injected dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-result-edit')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Result</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Institutional Merit List Modal -->
+  <div id="modal-merit-list" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-2xl">
+      <div class="modal-header">
+        <div class="flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+          <span class="modal-title">Institutional Merit List & Top Performers</span>
+        </div>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-merit-list')">&times;</button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="w-16">Rank</th>
+                <th>Candidate Name</th>
+                <th>Roll ID</th>
+                <th>Exam</th>
+                <th>Score</th>
+                <th>Percentage</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody id="merit-list-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.ExamPro.exportMeritListCSV()">Export Merit CSV</button>
+        <button class="btn btn-primary" onclick="window.ExamPro.closeModal('modal-merit-list')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Confirmation Action Modal -->
+  <div id="modal-confirm" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-box max-w-sm">
+      <div class="modal-header">
+        <span class="modal-title" id="confirm-modal-title">Confirm Action</span>
+        <button class="modal-close-btn" onclick="window.ExamPro.closeModal('modal-confirm')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-msg" class="text-sm text-muted">Are you sure you want to proceed with this operation?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.ExamPro.closeModal('modal-confirm')">Cancel</button>
+        <button id="confirm-modal-ok-btn" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="./script.js"></script>
+</body>
+</html>
